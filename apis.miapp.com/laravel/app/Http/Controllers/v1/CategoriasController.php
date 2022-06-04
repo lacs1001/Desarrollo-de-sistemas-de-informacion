@@ -14,6 +14,12 @@ class CategoriasController extends Controller
 
     function obtenerListado()
     {
+        $arr=[];
+        $arr["uno"]=1;
+        $arr["dos"]=1;
+
+        return $arr;
+
         $response = new \stdClass();
         $response->success = true;
 
