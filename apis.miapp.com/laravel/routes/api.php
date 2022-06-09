@@ -49,10 +49,7 @@ Route::get('/v1/categorias/{id}',[CategoriasController::class,'obtenerElemento']
 
 Route::post('/v1/seguridad/login',[AutorizacionController::class,'login']);
 
-
-Route::middleware('auth:api')->group(function () {
-
-     Route::post('/v1/productos',[ProductosController::class,'store']);
+Route::post('/v1/productos',[ProductosController::class,'store']);
     Route::put('/v1/productos',[ProductosController::class,'putUpdate']);
     Route::patch('/v1/productos',[ProductosController::class,'patchUpdate']);
     Route::delete('/v1/productos/{id}',[ProductosController::class,'delete']);
@@ -65,6 +62,11 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/v1/categorias/{id}',[CategoriasController::class,'eliminar']);
 
     Route::post('/v1/users',[UsersController::class,'save']);
+
+    
+Route::middleware('auth:api')->group(function () {
+
+     
 
 
 });
