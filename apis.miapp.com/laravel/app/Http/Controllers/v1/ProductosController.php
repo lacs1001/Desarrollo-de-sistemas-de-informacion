@@ -9,11 +9,21 @@ use App\Models\v1\Producto;
 
 class ProductosController extends Controller
 {
-    function getAll()
+    function getAll(Request $request)
     {
+        $search=$request->search;
+
+        if(!$search)
+        {
+            $search="%";
+        }
+
         $response= new \stdClass();
         
-        $productos = Producto::all();
+        $productos = Producto::where("codigo","like","%".$search."%")
+        ->orWhere("nombre","like","%".$search."%")
+        ->orWhere("categoria","like","%".$search."%")
+        ->get();
     
         $response->success=true;
         $response->data = $productos;
@@ -25,29 +35,86 @@ class ProductosController extends Controller
     {
         $response= new \stdClass();
         $producto = Producto::find($id);
-    
-        $response->success=true;
-        $response->data = $producto;
 
-        return response()->json($response,200);
+        if(!$producto)
+        {
+            $response->success=false;
+            $response->errors=["el producto con el id ".$id." no existe"];
+        }
+        else
+        {
+            $response->success=true;
+            $response->data = $producto;
+        }
+
+        return response()->json($response,($response->success?200:400));
     }
 
     function store(Request $request)
     {
         $response= new \stdClass();
+        $response->success=true;
+        $response_code=200;
+
+        $errors=[];
 
         $producto = new Producto();
 
         $producto->codigo = $request->codigo;
+        if(!$request->codigo)
+        {
+            $response->success=false;
+            $errors[]="Necesita ingresar el código";
+            $response_code=400;
+        }
+        
         $producto->nombre = $request->nombre;
+        if(!$request->nombre)
+        {
+            $response->success=false;
+            $errors[]="Necesita ingresar el nombre";
+            $response_code=400;
+        }
+
+        
         $producto->categoria = $request->categoria;
         $producto->precio = $request->precio;
-        $producto->save();
 
+        if($response->success)
+        {
+            $producto_db=Producto::where("codigo","=",$request->codigo)
+            ->orWhere("nombre","=",$request->nombre)
+            ->first();
 
-        $response->success=true;
-        $response->data = $producto;
-        return response()->json($response,200);   
+            if(!$producto_db)
+            {
+                $producto->save();
+                $response->data = $producto;
+            }
+            else
+            {
+                $response->success=false;
+                $response_code=400;
+                if($producto_db->codigo==$request->codigo)
+                {
+                    $errors[]="Ya existe un producto con el código ".$request->codigo;
+                    
+                }
+                if($producto_db->nombre==$request->nombre)
+                {
+                    $errors[]="Ya existe un producto con el nombre ".$request->nombre;
+                }
+                
+            }
+
+            
+        }
+        
+        if(!$response->success)
+        $response->errors=$errors;
+        
+        
+        return response()->json($response,$response_code);   
     }
 
     function putUpdate(Request $request)
