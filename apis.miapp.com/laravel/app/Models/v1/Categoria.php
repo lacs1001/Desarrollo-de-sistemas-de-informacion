@@ -12,6 +12,8 @@ class Categoria extends Model
     use HasUUID;
     use SoftDeletes;
 
+    //protected $connection= 'pgsql_categorias';
+
     /**
      * The table associated with the model.
      *

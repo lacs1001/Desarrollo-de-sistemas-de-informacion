@@ -27,4 +27,14 @@ class UsersController extends Controller
 		return response()->json($response,200);
 	}
 
+    function getItem()
+    {
+        $response = new \stdClass();
+        $response->success = true;
+
+        $response->data=auth()->user();
+
+        return response()->json($response,200);
+    }
+
 }

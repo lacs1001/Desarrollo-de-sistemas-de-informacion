@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use App\Models\v1\Producto;
 
+use Illuminate\Support\Facades\Storage;
+
 
 class ProductosController extends Controller
 {
@@ -76,6 +78,17 @@ class ProductosController extends Controller
             $response_code=400;
         }
 
+        if($request->imagen)
+        {
+            $file_content=base64_decode($request->imagen["data"]);
+
+            file_put_contents(base_path()."/../public_html/images/".$request->imagen["nombre"],$file_content);
+
+
+            $producto->ruta_imagen="/images/".$request->imagen["nombre"];
+
+            //return $request->imagen["data"];
+        }
         
         $producto->categoria = $request->categoria;
         $producto->precio = $request->precio;
